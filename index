@@ -8,129 +8,102 @@
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BikeStats">
 
     <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --row-bg: #2a2a2a;
-            --accent-food: #2ecc71;
-            --accent-water: #3498db;
-            --text-main: #ffffff;
-            --text-dim: #aaaaaa;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: #121212;
+            color: white;
             margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
         }
 
-        /* Navigazione Tab in basso */
+        /* Navigazione Tab */
         .nav-bar {
             display: flex;
-            background: var(--card-bg);
-            border-top: 1px solid #333;
-            padding-bottom: env(safe-area-inset-bottom);
-            z-index: 100;
+            background: #1e1e1e;
+            border-bottom: 1px solid #333;
         }
         .nav-item {
             flex: 1;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
             font-weight: bold;
-            color: #555;
+            color: #666;
             text-transform: uppercase;
-            font-size: 0.85rem;
-            transition: 0.3s;
         }
         .nav-item.active {
-            color: var(--accent-food);
-            background: #252525;
-            box-shadow: inset 0 3px 0 var(--accent-food);
-        }
-        #nav-water.active {
-            color: var(--accent-water);
-            box-shadow: inset 0 3px 0 var(--accent-water);
+            color: #2ecc71;
+            border-bottom: 3px solid #2ecc71;
         }
 
         .container {
-            flex: 1;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-y: auto;
-            padding-top: env(safe-area-inset-top);
+            flex: 1;
         }
 
-        .page { display: none; width: 100%; max-width: 400px; }
-        .page.active { display: block; animation: fadeIn 0.3s; }
+        .page { display: none; }
+        .page.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Display principale */
+        /* Display */
         .display {
             background: linear-gradient(145deg, #2ecc71, #27ae60);
-            padding: 30px 15px;
-            border-radius: 25px;
+            padding: 20px;
+            border-radius: 20px;
             text-align: center;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            margin-bottom: 20px;
         }
         .display.water { background: linear-gradient(145deg, #3498db, #2980b9); }
-        .display h2 { margin: 0; font-size: 0.8rem; text-transform: uppercase; opacity: 0.8; letter-spacing: 1.5px; }
-        .display .val { font-size: 4rem; font-weight: 900; margin-top: 5px; }
+        .display h2 { margin: 0; font-size: 0.8rem; text-transform: uppercase; }
+        .display .val { font-size: 3rem; font-weight: 900; }
 
-        /* Righe Cibo e Acqua */
+        /* Righe */
         .row {
-            background: var(--row-bg);
-            padding: 18px;
-            border-radius: 18px;
-            margin-bottom: 12px;
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border: 1px solid #333;
         }
 
-        .controls { display: flex; align-items: center; gap: 15px; }
-        .counter-value { font-size: 1.5rem; font-weight: bold; min-width: 30px; text-align: center; color: #00ff88; }
+        .controls { display: flex; align-items: center; gap: 10px; }
+        .counter-value { font-size: 1.2rem; font-weight: bold; min-width: 20px; text-align: center; color: #00ff88; }
 
-        /* Pulsanti */
         .btn {
-            border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white;
-            display: flex; align-items: center; justify-content: center; touch-action: manipulation;
+            border: none; border-radius: 10px; font-weight: bold; color: white;
+            display: flex; align-items: center; justify-content: center;
         }
-        .btn-plus { width: 50px; height: 50px; background: #3498db; font-size: 1.8rem; box-shadow: 0 4px 0 #2980b9; }
-        .btn-minus { width: 50px; height: 50px; background: #e74c3c; font-size: 1.8rem; box-shadow: 0 4px 0 #c0392b; }
-        .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 transparent; }
+        .btn-plus { width: 45px; height: 45px; background: #3498db; font-size: 1.5rem; }
+        .btn-minus { width: 45px; height: 45px; background: #e74c3c; font-size: 1.5rem; }
         
         .input-water {
-            background: #000; border: 2px solid #444; color: white;
-            padding: 12px; border-radius: 12px; width: 80px; text-align: center; font-size: 1.3rem;
+            background: #000; border: 1px solid #444; color: white;
+            padding: 10px; border-radius: 10px; width: 60px; text-align: center;
         }
-        .btn-add-water { background: var(--accent-food); padding: 12px 25px; font-size: 1rem; }
 
         /* Azioni Finali */
-        .actions { margin-top: 20px; display: grid; gap: 12px; width: 100%; max-width: 400px; padding-bottom: 60px; }
-        .btn-export { background: #f1c40f; color: #000; padding: 20px; border-radius: 20px; font-weight: 800; border: none; font-size: 1.1rem; }
-        .btn-reset { background: transparent; color: #ff7675; border: 1px solid #ff7675; padding: 12px; border-radius: 15px; font-size: 0.8rem; opacity: 0.7; }
+        .actions { margin-top: 20px; padding: 20px; display: grid; gap: 10px; }
+        .btn-export { background: #f1c40f; color: #000; padding: 15px; border-radius: 15px; font-weight: bold; border: none; width: 100%; }
+        .btn-reset { background: transparent; color: #ff7675; border: 1px solid #ff7675; padding: 10px; border-radius: 15px; width: 100%; }
     </style>
 </head>
 <body>
 
+<div class="nav-bar">
+    <div class="nav-item active" id="nav-food" onclick="showPage('food')">Cibo</div>
+    <div class="nav-item" id="nav-water" onclick="showPage('water')">Acqua</div>
+</div>
+
 <div class="container">
     <div id="page-food" class="page active">
         <div class="display">
-            <h2>Kcal Cibo Totali</h2>
+            <h2>Kcal Cibo</h2>
             <div class="val" id="kcalDisplay">0</div>
         </div>
         <div id="snack-list"></div>
@@ -138,27 +111,22 @@
 
     <div id="page-water" class="page">
         <div class="display water">
-            <h2>Liquidi Totali (cl)</h2>
+            <h2>Acqua (cl)</h2>
             <div class="val" id="waterDisplay">0</div>
         </div>
         <div class="row">
-            <span style="font-weight:bold">AGGIUNGI CL</span>
+            <span>AGGIUNGI cl</span>
             <div class="controls">
-                <input type="number" id="waterInput" class="input-water" placeholder="cl" inputmode="numeric">
-                <button class="btn btn-add-water" onclick="addWater()">OK</button>
+                <input type="number" id="waterInput" class="input-water" placeholder="cl">
+                <button class="btn btn-plus" style="background:#2ecc71; width:auto; padding:0 15px" onclick="addWater()">OK</button>
             </div>
         </div>
     </div>
 
     <div class="actions">
-        <button class="btn-export" onclick="exportData()">🚀 ESPORTA RIEPILOGO UNICO</button>
-        <button class="btn-reset" onclick="resetAll()">↺ AZZERA TUTTA LA SESSIONE</button>
+        <button class="btn-export" onclick="exportData()">🚀 ESPORTA MAIL</button>
+        <button class="btn-reset" onclick="resetAll()">↺ AZZERA TUTTO</button>
     </div>
-</div>
-
-<div class="nav-bar">
-    <div class="nav-item active" id="nav-food" onclick="showPage('food')">Snack</div>
-    <div class="nav-item" id="nav-water" onclick="showPage('water')">Acqua</div>
 </div>
 
 <script>
@@ -172,12 +140,11 @@
     ];
     let counts = { focaccia: 0, pappone: 0, smurfi: 0, bifi: 0 };
 
-    // Inserisce gli snack nella lista
     const listEl = document.getElementById('snack-list');
     snacks.forEach(s => {
         listEl.innerHTML += `
             <div class="row">
-                <div><span style="font-weight:bold; font-size:1.1rem">${s.name}</span><br><small style="color:#aaa">${s.kcal} kcal</small></div>
+                <div><b>${s.name}</b><br><small>${s.kcal} kcal</small></div>
                 <div class="controls">
                     <button class="btn btn-minus" onclick="updateSnack('${s.id}', -1, ${s.kcal})">-</button>
                     <span class="counter-value" id="count-${s.id}">0</span>
@@ -208,36 +175,19 @@
             totalWater += val;
             document.getElementById('waterDisplay').innerText = totalWater;
             input.value = '';
-            input.blur();
         }
     }
 
     function exportData() {
-        if(confirm("Vuoi inviare il riepilogo a m8online@gmail.com?")) {
-            const date = new Date().toLocaleDateString();
-            const subject = `Riepilogo Giro Bici - ${date}`;
-            
-            let body = `DATI ATTIVITÀ - ${date}%0D%0A`;
-            body += `---------------------------%0D%0A`;
-            body += `TOTALE CALORIE: ${totalKcal} kcal%0D%0A`;
-            body += `TOTALE ACQUA: ${totalWater} cl%0D%0A%0D%0A`;
-            body += `DETTAGLIO CONSUMI:%0D%0A`;
-            
-            let hasFood = false;
-            for(let key in counts) {
-                if(counts[key] > 0) {
-                    body += `- ${key.toUpperCase()}: ${counts[key]} pezzi%0D%0A`;
-                    hasFood = true;
-                }
-            }
-            if(!hasFood) body += "Nessun cibo consumato.%0D%0A";
-            
-            window.location.href = `mailto:m8online@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+        if(confirm("Inviare riepilogo a m8online@gmail.com?")) {
+            let body = `CALORIE: ${totalKcal} kcal%0D%0AACQUA: ${totalWater} cl%0D%0A%0D%0ADETTAGLIO:%0D%0A`;
+            for(let key in counts) { if(counts[key]>0) body += `- ${key}: ${counts[key]}%0D%0A`; }
+            window.location.href = `mailto:m8online@gmail.com?subject=Giro Bici&body=${body}`;
         }
     }
 
     function resetAll() {
-        if(confirm("ATTENZIONE: vuoi azzerare tutti i dati del giro attuale?")) {
+        if(confirm("Azzero?")) {
             totalKcal = 0; totalWater = 0;
             for (let key in counts) counts[key] = 0;
             document.getElementById('kcalDisplay').innerText = "0";
@@ -246,6 +196,5 @@
         }
     }
 </script>
-
 </body>
 </html>
