@@ -3,197 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bike Stats Pro</title>
-    
+    <title>Bike Stats</title>
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <style>
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: #121212;
-            color: white;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Navigazione Tab */
-        .nav-bar {
-            display: flex;
-            background: #1e1e1e;
-            border-bottom: 1px solid #333;
-        }
-        .nav-item {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: bold;
-            color: #666;
-            text-transform: uppercase;
-        }
-        .nav-item.active {
-            color: #2ecc71;
-            border-bottom: 3px solid #2ecc71;
-        }
-
-        .container {
-            padding: 20px;
-            flex: 1;
-        }
-
-        .page { display: none; }
-        .page.active { display: block; }
-
-        /* Display */
-        .display {
-            background: linear-gradient(145deg, #2ecc71, #27ae60);
-            padding: 20px;
-            border-radius: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .display.water { background: linear-gradient(145deg, #3498db, #2980b9); }
-        .display h2 { margin: 0; font-size: 0.8rem; text-transform: uppercase; }
-        .display .val { font-size: 3rem; font-weight: 900; }
-
-        /* Righe */
-        .row {
-            background: #2a2a2a;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .controls { display: flex; align-items: center; gap: 10px; }
-        .counter-value { font-size: 1.2rem; font-weight: bold; min-width: 20px; text-align: center; color: #00ff88; }
-
-        .btn {
-            border: none; border-radius: 10px; font-weight: bold; color: white;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .btn-plus { width: 45px; height: 45px; background: #3498db; font-size: 1.5rem; }
-        .btn-minus { width: 45px; height: 45px; background: #e74c3c; font-size: 1.5rem; }
-        
-        .input-water {
-            background: #000; border: 1px solid #444; color: white;
-            padding: 10px; border-radius: 10px; width: 60px; text-align: center;
-        }
-
-        /* Azioni Finali */
-        .actions { margin-top: 20px; padding: 20px; display: grid; gap: 10px; }
-        .btn-export { background: #f1c40f; color: #000; padding: 15px; border-radius: 15px; font-weight: bold; border: none; width: 100%; }
-        .btn-reset { background: transparent; color: #ff7675; border: 1px solid #ff7675; padding: 10px; border-radius: 15px; width: 100%; }
+        body { font-family: sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 20px; }
+        .display { background: #2ecc71; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
+        .val { font-size: 3rem; font-weight: bold; }
+        .row { background: #2a2a2a; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { border: none; padding: 15px 25px; border-radius: 10px; color: white; font-weight: bold; font-size: 1.2rem; }
+        .btn-plus { background: #3498db; }
+        .btn-minus { background: #e74c3c; }
+        input { background: #000; color: white; border: 1px solid #444; padding: 10px; width: 60px; border-radius: 10px; }
+        .export { background: #f1c40f; color: black; width: 100%; padding: 20px; margin-top: 20px; border-radius: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="nav-bar">
-    <div class="nav-item active" id="nav-food" onclick="showPage('food')">Cibo</div>
-    <div class="nav-item" id="nav-water" onclick="showPage('water')">Acqua</div>
-</div>
-
-<div class="container">
-    <div id="page-food" class="page active">
+    <div id="cibo">
         <div class="display">
-            <h2>Kcal Cibo</h2>
-            <div class="val" id="kcalDisplay">0</div>
+            <div>Kcal Cibo</div>
+            <div class="val" id="k">0</div>
         </div>
-        <div id="snack-list"></div>
+        <div class="row"><span>FOCACCIA</span><button class="btn btn-plus" onclick="u('f',1,320)">+</button></div>
+        <div class="row"><span>PAPPONE</span><button class="btn btn-plus" onclick="u('p',1,119)">+</button></div>
+        <div class="row"><span>SMURFI</span><button class="btn btn-plus" onclick="u('s',1,135)">+</button></div>
+        <div class="row"><span>BIFI</span><button class="btn btn-plus" onclick="u('b',1,108)">+</button></div>
     </div>
 
-    <div id="page-water" class="page">
-        <div class="display water">
-            <h2>Acqua (cl)</h2>
-            <div class="val" id="waterDisplay">0</div>
+    <hr>
+
+    <div id="acqua">
+        <div class="display" style="background:#3498db">
+            <div>Acqua (cl)</div>
+            <div class="val" id="w">0</div>
         </div>
         <div class="row">
-            <span>AGGIUNGI cl</span>
-            <div class="controls">
-                <input type="number" id="waterInput" class="input-water" placeholder="cl">
-                <button class="btn btn-plus" style="background:#2ecc71; width:auto; padding:0 15px" onclick="addWater()">OK</button>
-            </div>
+            <input type="number" id="wi" placeholder="cl">
+            <button class="btn" style="background:#2ecc71" onclick="addW()">OK</button>
         </div>
     </div>
 
-    <div class="actions">
-        <button class="btn-export" onclick="exportData()">🚀 ESPORTA MAIL</button>
-        <button class="btn-reset" onclick="resetAll()">↺ AZZERA TUTTO</button>
-    </div>
-</div>
+    <button class="export" onclick="ex()">🚀 ESPORTA MAIL</button>
+    <button onclick="location.reload()" style="background:none; border:none; color:grey; margin-top:20px">Azzera Pagina</button>
 
 <script>
-    let totalKcal = 0;
-    let totalWater = 0;
-    const snacks = [
-        { id: 'focaccia', name: 'FOCACCIA', kcal: 320 },
-        { id: 'pappone', name: 'PAPPONE', kcal: 119 },
-        { id: 'smurfi', name: 'SMURFI', kcal: 135 },
-        { id: 'bifi', name: 'BIFI', kcal: 108 }
-    ];
-    let counts = { focaccia: 0, pappone: 0, smurfi: 0, bifi: 0 };
-
-    const listEl = document.getElementById('snack-list');
-    snacks.forEach(s => {
-        listEl.innerHTML += `
-            <div class="row">
-                <div><b>${s.name}</b><br><small>${s.kcal} kcal</small></div>
-                <div class="controls">
-                    <button class="btn btn-minus" onclick="updateSnack('${s.id}', -1, ${s.kcal})">-</button>
-                    <span class="counter-value" id="count-${s.id}">0</span>
-                    <button class="btn btn-plus" onclick="updateSnack('${s.id}', 1, ${s.kcal})">+</button>
-                </div>
-            </div>`;
-    });
-
-    function showPage(p) {
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('page-' + p).classList.add('active');
-        document.getElementById('nav-' + p).classList.add('active');
+    let tk = 0, tw = 0;
+    function u(id, d, v) { tk += v; document.getElementById('k').innerText = tk; }
+    function addW() { 
+        let v = parseInt(document.getElementById('wi').value);
+        if(v) { tw += v; document.getElementById('w').innerText = tw; document.getElementById('wi').value=''; }
     }
-
-    function updateSnack(id, delta, kcal) {
-        if (delta === -1 && counts[id] <= 0) return;
-        counts[id] += delta;
-        totalKcal += (delta * kcal);
-        document.getElementById('count-' + id).innerText = counts[id];
-        document.getElementById('kcalDisplay').innerText = totalKcal;
-    }
-
-    function addWater() {
-        const input = document.getElementById('waterInput');
-        const val = parseInt(input.value);
-        if (val > 0) {
-            totalWater += val;
-            document.getElementById('waterDisplay').innerText = totalWater;
-            input.value = '';
-        }
-    }
-
-    function exportData() {
-        if(confirm("Inviare riepilogo a m8online@gmail.com?")) {
-            let body = `CALORIE: ${totalKcal} kcal%0D%0AACQUA: ${totalWater} cl%0D%0A%0D%0ADETTAGLIO:%0D%0A`;
-            for(let key in counts) { if(counts[key]>0) body += `- ${key}: ${counts[key]}%0D%0A`; }
-            window.location.href = `mailto:m8online@gmail.com?subject=Giro Bici&body=${body}`;
-        }
-    }
-
-    function resetAll() {
-        if(confirm("Azzero?")) {
-            totalKcal = 0; totalWater = 0;
-            for (let key in counts) counts[key] = 0;
-            document.getElementById('kcalDisplay').innerText = "0";
-            document.getElementById('waterDisplay').innerText = "0";
-            document.querySelectorAll('.counter-value').forEach(el => el.innerText = "0");
-        }
+    function ex() {
+        let b = `Kcal: ${tk}%0DAcqua: ${tw}cl`;
+        window.location.href = `mailto:m8online@gmail.com?subject=Giro Bici&body=${b}`;
     }
 </script>
 </body>
