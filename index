@@ -3,60 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bike Stats</title>
+    <title>Bike Stats Pro</title>
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 20px; }
-        .display { background: #2ecc71; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
-        .val { font-size: 3rem; font-weight: bold; }
-        .row { background: #2a2a2a; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .btn { border: none; padding: 15px 25px; border-radius: 10px; color: white; font-weight: bold; font-size: 1.2rem; }
-        .btn-plus { background: #3498db; }
-        .btn-minus { background: #e74c3c; }
-        input { background: #000; color: white; border: 1px solid #444; padding: 10px; width: 60px; border-radius: 10px; }
-        .export { background: #f1c40f; color: black; width: 100%; padding: 20px; margin-top: 20px; border-radius: 15px; font-weight: bold; }
+        body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 15px; text-align: center; }
+        .box { background: #1e1e1e; border-radius: 20px; padding: 15px; margin-bottom: 15px; border: 1px solid #333; }
+        .display { background: #2ecc71; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+        .display.water { background: #3498db; }
+        .val { font-size: 2.5rem; font-weight: 900; }
+        .label { font-size: 0.8rem; text-transform: uppercase; opacity: 0.8; }
+        .row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 10px; border-radius: 12px; margin-bottom: 8px; }
+        .controls { display: flex; align-items: center; gap: 8px; }
+        .btn { border: none; width: 40px; height: 40px; border-radius: 10px; color: white; font-weight: bold; font-size: 1.2rem; }
+        .btn-p { background: #3498db; }
+        .btn-m { background: #e74c3c; }
+        .num { min-width: 20px; font-weight: bold; color: #2ecc71; }
+        input { background: #000; color: white; border: 1px solid #444; padding: 10px; width: 50px; border-radius: 8px; text-align: center; }
+        .export { background: #f1c40f; color: black; width: 100%; padding: 18px; border-radius: 15px; font-weight: bold; border: none; font-size: 1rem; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="cibo">
+    <div class="box">
         <div class="display">
-            <div>Kcal Cibo</div>
-            <div class="val" id="k">0</div>
+            <div class="label">Calorie Totali</div>
+            <div class="val" id="tk">0</div>
         </div>
-        <div class="row"><span>FOCACCIA</span><button class="btn btn-plus" onclick="u('f',1,320)">+</button></div>
-        <div class="row"><span>PAPPONE</span><button class="btn btn-plus" onclick="u('p',1,119)">+</button></div>
-        <div class="row"><span>SMURFI</span><button class="btn btn-plus" onclick="u('s',1,135)">+</button></div>
-        <div class="row"><span>BIFI</span><button class="btn btn-plus" onclick="u('b',1,108)">+</button></div>
+        <div id="items"></div>
     </div>
 
-    <hr>
-
-    <div id="acqua">
-        <div class="display" style="background:#3498db">
-            <div>Acqua (cl)</div>
-            <div class="val" id="w">0</div>
+    <div class="box">
+        <div class="display water">
+            <div class="label">Acqua Totale (cl)</div>
+            <div class="val" id="tw">0</div>
         </div>
         <div class="row">
-            <input type="number" id="wi" placeholder="cl">
-            <button class="btn" style="background:#2ecc71" onclick="addW()">OK</button>
+            <span>AGGIUNGI CL</span>
+            <div class="controls">
+                <input type="number" id="wi" placeholder="cl">
+                <button class="btn" style="background:#2ecc71; width:auto; padding:0 15px" onclick="addW()">OK</button>
+            </div>
         </div>
     </div>
 
-    <button class="export" onclick="ex()">🚀 ESPORTA MAIL</button>
-    <button onclick="location.reload()" style="background:none; border:none; color:grey; margin-top:20px">Azzera Pagina</button>
+    <button class="export" onclick="ex()">🚀 ESPORTA RIEPILOGO MAIL</button>
+    <button onclick="if(confirm('Azzero?')) location.reload()" style="background:none; border:none; color:#666; margin-top:15px; font-size:0.7rem">RESET COMPLETO</button>
 
 <script>
-    let tk = 0, tw = 0;
-    function u(id, d, v) { tk += v; document.getElementById('k').innerText = tk; }
-    function addW() { 
-        let v = parseInt(document.getElementById('wi').value);
-        if(v) { tw += v; document.getElementById('w').innerText = tw; document.getElementById('wi').value=''; }
+    let kcal = 0, water = 0;
+    const data = [
+        {id:'foc', n:'FOCACCIA', k:320},
+        {id:'pap', n:'PAPPONE', k:119},
+        {id:'smu', n:'SMURFI', k:135},
+        {id:'bif', n:'BIFI', k:108}
+    ];
+    let counts = {foc:0, pap:0, smu:0, bif:0};
+
+    const container = document.getElementById('items');
+    data.forEach(item => {
+        container.innerHTML += `
+            <div class="row">
+                <div style="text-align:left"><b>${item.n}</b><br><small>${item.k} kcal</small></div>
+                <div class="controls">
+                    <button class="btn btn-m" onclick="upd('${item.id}',-1,${item.k})">-</button>
+                    <span class="num" id="c-${item.id}">0</span>
+                    <button class="btn btn-p" onclick="upd('${item.id}',1,${item.k})">+</button>
+                </div>
+            </div>`;
+    });
+
+    function upd(id, d, k) {
+        if(d === -1 && counts[id] <= 0) return;
+        counts[id] += d; kcal += (d * k);
+        document.getElementById('c-'+id).innerText = counts[id];
+        document.getElementById('tk').innerText = kcal;
     }
+
+    function addW() {
+        let v = parseInt(document.getElementById('wi').value);
+        if(v) { water += v; document.getElementById('tw').innerText = water; document.getElementById('wi').value=''; }
+    }
+
     function ex() {
-        let b = `Kcal: ${tk}%0DAcqua: ${tw}cl`;
-        window.location.href = `mailto:m8online@gmail.com?subject=Giro Bici&body=${b}`;
+        if(!confirm("Inviare a m8online@gmail.com?")) return;
+        let b = `RIEPILOGO GIRO%0A%0ACalorie: ${kcal} kcal%0AAcqua: ${water} cl%0A%0ADettaglio:%0A`;
+        for(let x in counts) if(counts[x]>0) b += `- ${x}: ${counts[x]}%0A`;
+        window.location.href = `mailto:m8online@gmail.com?subject=Bike Stats&body=${b}`;
     }
 </script>
 </body>
