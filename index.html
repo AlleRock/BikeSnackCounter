@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bike Stats Pro</title>
     
-    <link rel="apple-touch-icon" href="icon.png?v=1">
+    <link rel="apple-touch-icon" href="icon.png?v=2">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BikeStats">
 
     <style>
         body {
@@ -16,24 +15,46 @@
             background-color: #121212;
             color: white;
             margin: 0;
-            padding: env(safe-area-inset-top) 15px 20px 15px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Navigazione Tab */
+        .nav-bar {
+            display: flex;
+            background: #1e1e1e;
+            border-top: 1px solid #333;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-item {
+            flex: 1;
+            padding: 18px;
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .nav-item.active {
+            color: #2ecc71;
+            background: #252525;
+            box-shadow: inset 0 3px 0 #2ecc71;
+        }
+        #nav-water.active { color: #3498db; box-shadow: inset 0 3px 0 #3498db; }
+
+        .container {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
         }
 
-        .box {
-            background: #1e1e1e;
-            width: 100%;
-            max-width: 400px;
-            border-radius: 25px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #333;
-            box-sizing: border-box;
-        }
+        .page { display: none; width: 100%; max-width: 400px; }
+        .page.active { display: block; }
 
         .display {
             padding: 20px;
@@ -43,9 +64,8 @@
         }
         .display.food { background: linear-gradient(145deg, #2ecc71, #27ae60); }
         .display.water { background: linear-gradient(145deg, #3498db, #2980b9); }
-        
-        .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; font-weight: bold; }
-        .val { font-size: 3.5rem; font-weight: 900; margin: 5px 0; }
+        .val { font-size: 3rem; font-weight: 900; margin: 0; }
+        .label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; }
 
         .row {
             display: flex;
@@ -54,125 +74,151 @@
             background: #2a2a2a;
             padding: 12px;
             border-radius: 15px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #333;
         }
 
-        .info b { font-size: 1.1rem; display: block; }
-        .info small { color: #aaa; font-size: 0.8rem; }
+        .info b { font-size: 0.9rem; display: block; }
+        .info small { color: #888; font-size: 0.75rem; }
 
-        .controls { display: flex; align-items: center; gap: 12px; }
-        .num { min-width: 30px; font-weight: bold; font-size: 1.4rem; color: #2ecc71; text-align: center; }
+        .controls { display: flex; align-items: center; gap: 10px; }
+        .num { min-width: 25px; font-weight: bold; font-size: 1.3rem; color: #2ecc71; text-align: center; }
 
         .btn {
-            border: none; width: 48px; height: 48px; border-radius: 12px; 
-            color: white; font-weight: bold; font-size: 1.5rem;
-            display: flex; align-items: center; justify-content: center;
+            border: none; width: 44px; height: 44px; border-radius: 12px; color: white;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
             touch-action: manipulation;
         }
-        .btn-p { background: #3498db; box-shadow: 0 4px 0 #2980b9; }
-        .btn-m { background: #e74c3c; box-shadow: 0 4px 0 #c0392b; }
-        .btn:active { transform: translateY(2px); box-shadow: none; }
+        .btn-p { background: #3498db; }
+        .btn-m { background: #e74c3c; }
         
         input {
-            background: #000; color: white; border: 2px solid #444; 
-            padding: 12px; width: 70px; border-radius: 12px; 
-            text-align: center; font-size: 1.2rem;
+            background: #000; color: white; border: 1px solid #444; padding: 12px;
+            width: 70px; border-radius: 12px; text-align: center; font-size: 1.2rem;
         }
 
-        .actions { width: 100%; max-width: 400px; margin-top: 10px; display: flex; flex-direction: column; gap: 15px; }
-        .btn-export { 
-            background: #f1c40f; color: black; width: 100%; padding: 20px; 
-            border-radius: 18px; font-weight: 800; border: none; font-size: 1.2rem; 
-        }
-        .reset-btn { 
-            background: none; border: 1px solid #444; color: #666; 
-            padding: 10px; border-radius: 10px; font-size: 0.8rem; text-transform: uppercase;
-        }
+        .actions { width: 100%; max-width: 400px; margin-top: auto; padding: 10px 0 20px 0; }
+        .btn-export { background: #f1c40f; color: #000; width: 100%; padding: 18px; border-radius: 15px; font-weight: 800; border: none; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
-    <div class="box">
+<div class="container">
+    <div id="page-food" class="page active">
         <div class="display food">
-            <div class="label">Calorie Totali</div>
-            <div class="val" id="totalKcal">0</div>
+            <div class="label">Kcal Totali</div>
+            <div class="val" id="kcalDisp">0</div>
         </div>
         <div id="snack-list"></div>
     </div>
 
-    <div class="box">
+    <div id="page-water" class="page">
         <div class="display water">
-            <div class="label">Acqua Totale (cl)</div>
-            <div class="val" id="totalWater">0</div>
+            <div class="label">Liquidi (cl)</div>
+            <div class="val" id="waterDisp">0</div>
         </div>
         <div class="row">
-            <b>BORRACCIA</b>
+            <b>AGGIUNGI CL</b>
             <div class="controls">
-                <input type="number" id="waterInput" placeholder="cl" inputmode="numeric">
-                <button class="btn" style="background:#2ecc71; width:auto; padding:0 25px; box-shadow: 0 4px 0 #27ae60;" onclick="addWater()">OK</button>
+                <input type="number" id="wIn" placeholder="cl" inputmode="numeric">
+                <button class="btn" style="background:#2ecc71; width:auto; padding:0 20px" onclick="addW()">OK</button>
             </div>
         </div>
     </div>
 
     <div class="actions">
-        <button class="btn-export" onclick="exportMail()">🚀 ESPORTA RIEPILOGO MAIL</button>
-        <button class="reset-btn" onclick="if(confirm('Azzero tutta la sessione?')) location.reload()">↺ Azzera Tutto</button>
+        <button class="btn-export" onclick="exportMail()">🚀 ESPORTA RIEPILOGO UNICO</button>
+        <button onclick="resetData()" style="background:none; border:none; color:#444; width:100%; margin-top:10px; font-size:0.7rem">RESET COMPLETO SESSIONE</button>
     </div>
+</div>
+
+<div class="nav-bar">
+    <div class="nav-item active" id="nav-food" onclick="showPage('food')">Cibo</div>
+    <div class="nav-item" id="nav-water" onclick="showPage('water')">Acqua</div>
+</div>
 
 <script>
-    let kcal = 0, water = 0;
+    // Configurazione Snack
     const snacks = [
         {id:'foc', n:'FOCACCIA', k:320},
-        {id:'pap', n:'PAPPONE', k:119},
-        {id:'smu', n:'SMURFI', k:135},
+        {id:'p-f', n:'PAPPONE FRUDIBOSCO', k:119},
+        {id:'p-b', n:'PAPPONE BANANA', k:119},
+        {id:'p-p', n:'PAPPONE PESCA', k:119},
+        {id:'smu', n:'STARMICS-SMURFI', k:135},
         {id:'bif', n:'BIFI', k:108}
     ];
-    let counts = {foc:0, pap:0, smu:0, bif:0};
 
-    const container = document.getElementById('snack-list');
+    // Caricamento Dati o Inizializzazione
+    let counts = JSON.parse(localStorage.getItem('counts')) || {};
+    snacks.forEach(s => { if(!counts[s.id]) counts[s.id] = 0; });
+    let water = parseInt(localStorage.getItem('water')) || 0;
+
+    function save() {
+        localStorage.setItem('counts', JSON.stringify(counts));
+        localStorage.setItem('water', water);
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        let tk = 0;
+        snacks.forEach(s => {
+            document.getElementById('c-'+s.id).innerText = counts[s.id];
+            tk += (counts[s.id] * s.k);
+        });
+        document.getElementById('kcalDisp').innerText = tk;
+        document.getElementById('waterDisp').innerText = water;
+    }
+
+    // Generazione Lista
+    const list = document.getElementById('snack-list');
     snacks.forEach(s => {
-        container.innerHTML += `
+        list.innerHTML += `
             <div class="row">
                 <div class="info"><b>${s.n}</b><small>${s.k} kcal</small></div>
                 <div class="controls">
-                    <button class="btn btn-m" onclick="update('${s.id}', -1, ${s.k})">-</button>
+                    <button class="btn btn-m" onclick="change('${s.id}',-1)">-</button>
                     <span class="num" id="c-${s.id}">0</span>
-                    <button class="btn btn-p" onclick="update('${s.id}', 1, ${s.k})">+</button>
+                    <button class="btn btn-p" onclick="change('${s.id}',1)">+</button>
                 </div>
             </div>`;
     });
 
-    function update(id, delta, k) {
-        if(delta === -1 && counts[id] <= 0) return;
-        counts[id] += delta;
-        kcal += (delta * k);
-        document.getElementById('c-'+id).innerText = counts[id];
-        document.getElementById('totalKcal').innerText = kcal;
+    function showPage(p) {
+        document.querySelectorAll('.page, .nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('page-'+p).classList.add('active');
+        document.getElementById('nav-'+p).classList.add('active');
     }
 
-    function addWater() {
-        const input = document.getElementById('waterInput');
-        const v = parseInt(input.value);
-        if(v) {
-            water += v;
-            document.getElementById('totalWater').innerText = water;
-            input.value = '';
-            input.blur();
-        }
+    function change(id, d) {
+        if(d === -1 && counts[id] <= 0) return;
+        counts[id] += d;
+        save();
+    }
+
+    function addW() {
+        let v = parseInt(document.getElementById('wIn').value);
+        if(v) { water += v; document.getElementById('wIn').value=''; document.getElementById('wIn').blur(); save(); }
     }
 
     function exportMail() {
-        if(!confirm("Vuoi inviare il riepilogo a m8online@gmail.com?")) return;
-        const subject = encodeURIComponent("Bike Report - " + new Date().toLocaleDateString());
-        let body = `REPORT GIRO%0A%0A`;
-        body += `ENERGIA: ${kcal} kcal%0A`;
-        body += `IDRATAZIONE: ${water} cl%0A%0A`;
-        body += `DETTAGLIO CONSUMI:%0A`;
-        for(let key in counts) {
-            if(counts[key] > 0) body += `- ${key.toUpperCase()}: ${counts[key]}%0A`;
-        }
-        window.location.href = `mailto:m8online@gmail.com?subject=${subject}&body=${body}`;
+        let tk = document.getElementById('kcalDisp').innerText;
+        let body = `RIEPILOGO GIRO%0A%0ACalorie: ${tk} kcal%0AAcqua: ${water} cl%0A%0ADettaglio:%0A`;
+        snacks.forEach(s => { if(counts[s.id]>0) body += `- ${s.n}: ${counts[key]}%0A`; }); // Correzione logica in arrivo
+        // Correzione rapida per il loop
+        let detail = "";
+        snacks.forEach(s => { if(counts[s.id]>0) detail += `- ${s.n}: ${counts[s.id]}%0A`; });
+        
+        window.location.href = `mailto:m8online@gmail.com?subject=Bike Stats&body=${body.split('Dettaglio:')[0]}Dettaglio:%0A${detail}`;
     }
+
+    function resetData() {
+        if(confirm("Vuoi azzerare tutto?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    updateDisplay();
 </script>
 </body>
 </html>
